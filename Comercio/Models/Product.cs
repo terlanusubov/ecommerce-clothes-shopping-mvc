@@ -25,5 +25,6 @@
         public Category Category { get; set; }
         public GenderType GenderType { get; set; }
         public ICollection<ProductOption> ProductOptions { get; set; }
+        public ICollection<ProductPhoto> ProductPhotos { get; set; }
     }
 }
