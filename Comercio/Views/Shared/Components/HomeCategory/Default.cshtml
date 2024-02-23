@@ -1,0 +1,56 @@
+﻿@model List<CategoryDto>
+<section class="product-category section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="title text-center">
+                    <h2>Product Category</h2>
+                </div>
+            </div>
+            @{
+                var counter = 0;
+            }
+            <div class="col-md-6">
+                @for (var i = counter; i < Model.Count; i++)
+                {
+                    if (counter != 2)
+                    {
+                        <div class="category-box">
+                            <a href="#!">
+                                <img src="@Model[i].BackgroundImageUrl" alt="" />
+                                <div class="content">
+                                    <h3>@Model[i].Name</h3>
+                                    <p>@Model[i].Slogan</p>
+                                </div>
+                            </a>
+                        </div>
+
+                        counter++;
+                    }
+
+                }
+
+            </div>
+            <div class="col-md-6">
+                @for (var i = counter; i < Model.Count; i++)
+                {
+                    if (counter != 4)
+                    {
+                        <div class="category-box category-box-2">
+                            <a href="#!">
+                                <img src="@Model[i].BackgroundImageUrl" alt="" />
+                                <div class="content">
+                                    <h3>@Model[i].Name</h3>
+                                    <p>@Model[i].Slogan</p>
+                                </div>
+                            </a>
+                        </div>
+
+                        counter++;
+                    }
+
+                }
+            </div>
+        </div>
+    </div>
+</section>

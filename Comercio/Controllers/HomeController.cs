@@ -18,46 +18,7 @@ namespace Comercio.Controllers
 			_configuration = configuration;
 		}
 
-		public IActionResult Index()
-		{
-			var sliders = _context.Sliders
-								   .Select(s => new SliderDto
-								   {
-									   SliderId = s.Id,
-									   Title = s.Title,
-									   BackgroundImageUrl = _configuration["Folders:Sliders"] + s.BackgrounImageURL,
-									   Text = s.Slogan,
-									   Link = s.Link,
-								   })
-								   .OrderByDescending(s => s.SliderId)
-								   .ToList();
-
-
-			var categories = _context.Categories.Where(c => c.IsMainPage)
-												.Select(c => new CategoryDto
-												{
-													Slogan = c.Slogan,
-													
-													CategoryId = c.Id,
-													
-													BackgroundImageUrl = _configuration["Folders:Categories"] + c.BackgroundImageURL,
-													
-													Name = c.Name,
-													
-													Priority = c.Priority ?? 0
-												})
-												.OrderBy(c=>c.Priority)
-												.ToList();
-
-
-
-			var vm = new HomeIndexVm();
-
-			vm.Sliders = sliders;
-
-			vm.Categories = categories;
-
-			return View(vm);
-		}
+		public IActionResult Index() => View();
+		
 	}
 }
