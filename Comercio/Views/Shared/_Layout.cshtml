@@ -159,14 +159,14 @@
                     </button>
 
                 </div><!-- / .navbar-header -->
+                @await Component.InvokeAsync("Navigation")
 
-               @await Component.InvokeAsync("Navigation");
- 
-           </div><!-- / .container -->
+            </div><!-- / .container -->
         </nav>
     </section>
 
     @RenderBody()
+
     <footer class="footer section text-center">
         <div class="container">
             <div class="row">
@@ -213,6 +213,52 @@
         </div>
     </footer>
 
+
+    @if (TempData["error"]?.ToString() is not null)
+    {
+        <div class="modal product-modal fade in" id="info-message" style="display:block;">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <i class="tf-ion-close"></i>
+            </button>
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8 col-sm-6 col-xs-12">
+                                <div class="modal-image">
+                                    <p>@TempData["error"]?.ToString()</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
+    @if (TempData["success"]?.ToString() is not null)
+    {
+        <div class="modal product-modal fade in" id="info-message" style="display:block;">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <i class="tf-ion-close"></i>
+            </button>
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8 col-sm-6 col-xs-12">
+                                <div class="modal-image">
+                                    <p>@TempData["success"]?.ToString()</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
     <!--
     Essential Scripts
     =====================================-->
@@ -239,8 +285,15 @@
 
     <!-- Main Js File -->
     <script src="~/js/script.js"></script>
-
-
+    <script>
+        const modalMessage = document.querySelector("#info-message");
+        if (modalMessage != undefined && modalMessage != null) {
+            const closeButton = modalMessage.querySelector(".close");
+            closeButton.addEventListener("click", function () {
+                modalMessage.style.display = "none";
+            })
+        }
+    </script>
 
 </body>
 </html>
