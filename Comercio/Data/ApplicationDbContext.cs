@@ -46,8 +46,10 @@ namespace Comercio.Data
                 
                 entity.Property(p=>p.PasswordHash).IsRequired().HasMaxLength(32);
                 
-                entity.Property(p=>p.Salt).IsRequired().HasMaxLength(32);
-                
+                entity.Property(p=>p.Salt).IsRequired();
+
+                entity.Property(p=>p.EmailConfirmed).IsRequired().HasDefaultValue(false);
+
                 entity.Property(p => p.UserRoleId).IsRequired();
             });
             #endregion

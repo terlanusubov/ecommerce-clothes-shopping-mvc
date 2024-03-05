@@ -130,13 +130,15 @@
                             </ul>
                         </li><!-- / Search -->
                         <!-- Languages -->
-                        <li class="commonSelect">
-                            <select class="form-control">
-                                <option>EN</option>
-                                <option>DE</option>
-                                <option>FR</option>
-                                <option>ES</option>
-                            </select>
+                        <li class="account-settings">
+                            @if (Context.User.Identity.IsAuthenticated)
+                            {
+                                <a href="#">@Context.User.Claims.Where(c => c.Type == "Name").FirstOrDefault()?.Value @Context.User.Claims.Where(c => c.Type == "Surname").FirstOrDefault()?.Value</a>
+                            }
+                            else
+                            {
+                              <a href="@Url.Action("Login","Account")">Login</a> <span>/</span> <a href="@Url.Action("Register","Account")">Register</a>
+                            }
                         </li><!-- / Languages -->
 
                     </ul><!-- / .nav .navbar-nav .navbar-right -->
