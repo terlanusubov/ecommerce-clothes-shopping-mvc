@@ -12,17 +12,22 @@ using Comercio.Enums;
 using System.Net.Mail;
 using System.Net;
 using System.Net.Http;
+using Comercio.Notifications.Slack;
 
 namespace Comercio.Controllers
 {
     public class AccountController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly SlackService _slackService;
 
-        public AccountController(ApplicationDbContext context)
+        public AccountController(ApplicationDbContext context,
+                                 SlackService slackService)
         {
             _context = context;
+            _slackService = slackService;
         }
+
         public IActionResult Login()
         {
             return View();
@@ -36,7 +41,9 @@ namespace Comercio.Controllers
                 return View(request);
             }
 
-            var user = await _context.Users.Where(c => c.Email == request.Email &&
+            var user = await _context.Users
+                                        .Include(c=>c.UserRole)
+                                        .Where(c => c.Email == request.Email &&
                                                        c.UserStatusId == (int)UserStatusEnum.Active).FirstOrDefaultAsync();
 
             if (user is null)
@@ -59,7 +66,8 @@ namespace Comercio.Controllers
                   new Claim("Surname", user.Surname),
                   new Claim("Email", user.Email),
                   new Claim("Id", user.Id.ToString()),
-                  new Claim("RoleId", user.UserRoleId.ToString())
+                  new Claim("RoleId", user.UserRoleId.ToString()),
+                  new Claim(ClaimTypes.Role, user.UserRole.Name)
               };
 
             var claimsIdentity = new ClaimsIdentity(
@@ -111,6 +119,8 @@ namespace Comercio.Controllers
                 await _context.Users.AddAsync(user);
 
                 await _context.SaveChangesAsync();
+
+                _slackService.SendRegisterUserInfo(user.Name + " " + user.Surname + " " + user.Email + " " + user.Created?.ToString("dd:MM:yyyy hh:mm:ss") + " tarixində qeydiyyatdan keçmişdir.");
 
                 return RedirectToAction("Login", "Account");
             }

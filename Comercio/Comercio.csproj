@@ -22,8 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Admin\Data\" />
     <Folder Include="wwwroot\images\shop\category\" />
     <Folder Include="wwwroot\images\slider\" />
+    <Folder Include="wwwroot\admin\" />
   </ItemGroup>
 
 </Project>
