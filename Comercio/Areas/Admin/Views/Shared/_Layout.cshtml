@@ -13,6 +13,7 @@
     <link href="~/admin/assets/css/structure.css" rel="stylesheet" type="text/css" class="structure" />
     <link href="~/admin/assets/css/structure.css" rel="stylesheet" type="text/css" class="structure" />
     <!-- END GLOBAL MANDATORY STYLES -->
+    @RenderSection("CSS",false)
     <!-- BEGIN PAGE LEVEL PLUGINS/CUSTOM STYLES -->
 
     <style>
@@ -232,6 +233,7 @@
     <script src="~/admin/assets/js/custom.js"></script>
     <!-- END GLOBAL MANDATORY SCRIPTS -->
     <!-- BEGIN PAGE LEVEL PLUGINS/CUSTOM SCRIPTS -->
+   @RenderSection("SCRIPTS",false)
     <!-- BEGIN PAGE LEVEL PLUGINS/CUSTOM SCRIPTS -->
 </body>
 </html>

@@ -1,4 +1,4 @@
-﻿@{
+﻿s@{
     ViewData["Title"] = "İstifadəçilər";
 }
 @model UserListVm
@@ -12,68 +12,119 @@
         </div>
     </div>
     <div class="widget-content widget-content-area">
-        <div class="table-responsive">
-            <table class="table table-bordered mb-4">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Ad</th>
-                        <th>Soyad</th>
-                        <th>E-poçt</th>
-                        <th>Cinsiyyət</th>
-                        <th>Qeydiyyat tarixi</th>
-                        <th>Rol</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var user in Model.Users)
+
+        <div id="table-area">
+            @await Html.PartialAsync("_UserListPartialView", Model)
+
+        </div>
+
+        <div class="paginating-container pagination-default">
+            <ul class="pagination">
+                @for (int i = 1; i <= Model.TotalPage; i++)
+                {
+                    if (i == Model.CurrentPage)
                     {
-                        <tr>
-                            <td>@user.UserId</td>
-                            <td>@user.Name</td>
-                            <td>@user.Surname</td>
-                            <td>@user.Email</td>
-                            <td>@user.GenderText</td>
-                            <td>@user.Registered?.ToString("dd/MM/yyyy hh:mm:ss")</td>
-                            <td class="text-center">
-                                @if (user.RoleId == (byte)UserRoleEnum.User)
-                                {
-                                    <span class="badge badge-success">@user.Role</span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-danger">@user.Role</span>
-                                }
-                            </td>
-
-                            <td class="text-center">
-                                @if (user.UserStatusId == (byte)UserStatusEnum.Active)
-                                {
-                                    <span class="badge badge-success">@user.StatusText</span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-danger">@user.StatusText</span>
-                                }
-                            </td>
-                            <td class="text-center">
-                                <div class="dropdown custom-dropdown">
-                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                    </a>
-
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
-                                        <a class="dropdown-item" href="javascript:void(0);">Düzəliş et</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Sil</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
+                        <li class="active"><a href="#">@i.ToString()</a></li>
                     }
-                </tbody>
-            </table>
+                    else
+                    {
+                        <li><a href="#">@i.ToString()</a></li>
+                    }
+                }
+            </ul>
         </div>
     </div>
+
 </div>
+
+
+@section CSS {
+    <link href="~/admin/assets/css/elements/custom-pagination.css" rel="stylesheet" type="text/css" />
+}
+
+@section SCRIPTS {
+    <script src="~/admin/assets/js/scrollspyNav.js"></script>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const paginations = document.querySelectorAll(".pagination a");
+
+            for (let pagination of paginations) {
+                pagination.addEventListener("click", function (e) {
+                    e.preventDefault();
+
+                    let xhr = new XMLHttpRequest();
+
+                    const clickedPage = this.innerText;
+
+
+
+                    xhr.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+
+                            const previousActive = document.querySelector(".pagination li.active");
+
+                            console.log(previousActive);
+
+                            previousActive.classList.remove("active");
+
+                            pagination.parentElement.classList.add("active");
+
+                            const result = JSON.parse(this.responseText);
+
+                            document.querySelector("#table-area").innerHTML = result.data;
+
+                            // for (let user of result.data) {
+
+                            //     const roleClass = user.roleId == @((byte)UserRoleEnum.User)? "badge badge-success" : "badge badge-danger";
+                            //     const statusClass = user.userStatusId == @((byte)UserStatusEnum.Active)? "badge badge-success" : "badge badge-danger";
+                            //     const tr = `
+                            //                                          <tr>
+                            //                                 <td>${user.userId}</td>
+                            //                                 <td>${user.name}</td>
+                            //                                 <td>${user.surname}</td>
+                            //                                 <td>${user.email}</td>
+                            //                                 <td>${user.genderText}</td>
+                            //                                 <td>${user.registered}</td>
+                            //                                 <td class="text-center">
+                            //                                             <span class="${roleClass}">${user.role}</span>
+                            //                                 </td>
+
+                            //                                 <td class="text-center">
+                            //                                               <span class="${statusClass}">${user.statusText}</span>
+                            //                                 </td>
+                            //                                 <td class="text-center">
+                            //                                     <div class="dropdown custom-dropdown">
+                            //                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            //                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                            //                                         </a>
+
+                            //                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
+                            //                                             <a class="dropdown-item" href="javascript:void(0);">Düzəliş et</a>
+                            //                                             <a class="dropdown-item" href="javascript:void(0);">Sil</a>
+                            //                                         </div>
+                            //                                     </div>
+                            //                                 </td>
+                            //                             </tr>
+                            //                                 `;
+
+                            //     document.querySelector("tbody").innerHTML += tr;
+
+
+                            // }
+
+                        }
+                    }
+
+                    xhr.open("GET", "https://localhost:7024/Admin/User/Filter?page=" + clickedPage, true);
+
+                    xhr.send();
+                })
+            }
+        })
+
+
+       
+    </script>
+}
