@@ -1,6 +1,8 @@
 ﻿@model UserListVm
 
+
 <div class="table-responsive">
+   
     <table class="table table-bordered mb-4">
         <thead>
             <tr>
@@ -39,11 +41,11 @@
                     <td class="text-center">
                         @if (user.UserStatusId == (byte)UserStatusEnum.Active)
                         {
-                            <span class="badge badge-success">@user.StatusText</span>
+                            <span data-userId="@user.UserId" data-change-id="@((byte)UserStatusEnum.Deactive)" class="user-status badge badge-success">@user.StatusText</span>
                         }
                         else
                         {
-                            <span class="badge badge-danger">@user.StatusText</span>
+                            <span data-userId="@user.UserId" data-change-id="@((byte)UserStatusEnum.Active)" class="user-status badge badge-danger">@user.StatusText</span>
                         }
                     </td>
                     <td class="text-center">
@@ -63,3 +65,20 @@
         </tbody>
     </table>
 </div>
+
+<div class="paginating-container pagination-default">
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPage; i++)
+        {
+            if (i == Model.CurrentPage)
+            {
+                <li class="active"><a href="#">@i.ToString()</a></li>
+            }
+            else
+            {
+                <li><a href="#">@i.ToString()</a></li>
+            }
+        }
+    </ul>
+</div>
+

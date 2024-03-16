@@ -76,6 +76,32 @@ namespace Comercio.Areas.Admin.Controllers
             });
         }
 
+        [HttpPost]
+        public async Task<JsonResult> ChangeStatus([FromBody]ChangeUserStatusModel request)
+        {
+            //TODO: validation
+
+            var user = await _context.Users.Where(u=> u.Id == request.UserId).FirstOrDefaultAsync();
+            if(user is null)
+            {
+                return Json(new
+                {
+                    status = 400,
+                    error = "Belə bir istifadəçi yoxdur."
+                });
+            }
+
+            user.UserStatusId = request.StatusId;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                status = 200
+            });
+
+        }
+     
         private async Task<(List<UserDto>,int)> SelectUsers(IQueryable<User> query, int page)
         {
             query = query.OrderByDescending(u => u.Created);
@@ -133,5 +159,6 @@ namespace Comercio.Areas.Admin.Controllers
                 return writer.GetStringBuilder().ToString();
             }
         }
+
     }
 }

@@ -13,118 +13,231 @@
     </div>
     <div class="widget-content widget-content-area">
 
+        <div id="filter-wrapper">
+            <input type="text" class="form-control" id="name" placeholder="Ad" aria-label="name">
+            <input type="text" class="form-control" id="surname" placeholder="Soyad" aria-label="surname">
+            <input type="text" class="form-control" id="email" placeholder="E-poçt" aria-label="email">
+        </div>
         <div id="table-area">
             @await Html.PartialAsync("_UserListPartialView", Model)
-
-        </div>
-
-        <div class="paginating-container pagination-default">
-            <ul class="pagination">
-                @for (int i = 1; i <= Model.TotalPage; i++)
-                {
-                    if (i == Model.CurrentPage)
-                    {
-                        <li class="active"><a href="#">@i.ToString()</a></li>
-                    }
-                    else
-                    {
-                        <li><a href="#">@i.ToString()</a></li>
-                    }
-                }
-            </ul>
         </div>
     </div>
-
 </div>
 
 
 @section CSS {
     <link href="~/admin/assets/css/elements/custom-pagination.css" rel="stylesheet" type="text/css" />
+    <style>
+       #filter-wrapper{
+           display:flex;
+           gap:20px;
+           padding:15px 0px;
+       }
+       .user-status{
+           cursor:pointer;
+       }
+    </style>
+    <link href="~/admin/assets/css/scrollspyNav.css" rel="stylesheet" type="text/css" />
+    <link href="~/admin/plugins/animate/animate.css" rel="stylesheet" type="text/css" />
+    <script src="~/admin/plugins/sweetalerts/promise-polyfill.js"></script>
+    <link href="~/admin/plugins/sweetalerts/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/admin/plugins/sweetalerts/sweetalert.css" rel="stylesheet" type="text/css" />
+    <link href="~/admin/assets/css/components/custom-sweetalert.css" rel="stylesheet" type="text/css" />
 }
 
 @section SCRIPTS {
+    <script src="~/admin/plugins/sweetalerts/sweetalert2.min.js"></script>
+    <script src="~/admin/plugins/sweetalerts/custom-sweetalert.js"></script>
     <script src="~/admin/assets/js/scrollspyNav.js"></script>
-
+    <script src="~/admin/assets/js/userFilter.js"></script>
     <script>
 
         document.addEventListener("DOMContentLoaded", function () {
-            const paginations = document.querySelectorAll(".pagination a");
+            FilterByPagination();
 
-            for (let pagination of paginations) {
-                pagination.addEventListener("click", function (e) {
-                    e.preventDefault();
+            const nameFilter = document.getElementById("name");
+            const surnameFilter = document.getElementById("surname");
+            const emailFilter = document.getElementById("email");
 
-                    let xhr = new XMLHttpRequest();
+            nameFilter.addEventListener("keyup", function () {
 
-                    const clickedPage = this.innerText;
+                Filter((res) => {
+                    const result = JSON.parse(res.responseText);
+                    document.querySelector("#table-area").innerHTML = result.data;
+                    FilterByPagination();
+                    ChangeUserStatus((res, userStatus, changeStatusId) => {
 
+                        res = JSON.parse(res.responseText);
 
-
-                    xhr.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-
-                            const previousActive = document.querySelector(".pagination li.active");
-
-                            console.log(previousActive);
-
-                            previousActive.classList.remove("active");
-
-                            pagination.parentElement.classList.add("active");
-
-                            const result = JSON.parse(this.responseText);
-
-                            document.querySelector("#table-area").innerHTML = result.data;
-
-                            // for (let user of result.data) {
-
-                            //     const roleClass = user.roleId == @((byte)UserRoleEnum.User)? "badge badge-success" : "badge badge-danger";
-                            //     const statusClass = user.userStatusId == @((byte)UserStatusEnum.Active)? "badge badge-success" : "badge badge-danger";
-                            //     const tr = `
-                            //                                          <tr>
-                            //                                 <td>${user.userId}</td>
-                            //                                 <td>${user.name}</td>
-                            //                                 <td>${user.surname}</td>
-                            //                                 <td>${user.email}</td>
-                            //                                 <td>${user.genderText}</td>
-                            //                                 <td>${user.registered}</td>
-                            //                                 <td class="text-center">
-                            //                                             <span class="${roleClass}">${user.role}</span>
-                            //                                 </td>
-
-                            //                                 <td class="text-center">
-                            //                                               <span class="${statusClass}">${user.statusText}</span>
-                            //                                 </td>
-                            //                                 <td class="text-center">
-                            //                                     <div class="dropdown custom-dropdown">
-                            //                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            //                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                            //                                         </a>
-
-                            //                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
-                            //                                             <a class="dropdown-item" href="javascript:void(0);">Düzəliş et</a>
-                            //                                             <a class="dropdown-item" href="javascript:void(0);">Sil</a>
-                            //                                         </div>
-                            //                                     </div>
-                            //                                 </td>
-                            //                             </tr>
-                            //                                 `;
-
-                            //     document.querySelector("tbody").innerHTML += tr;
-
-
-                            // }
-
+                        if (res.status == 400) {
+                            swal({
+                                type: 'error',
+                                title: 'Oops...',
+                                text: `${res.error}`
+                            });
+                            return;
                         }
+                        else {
+
+                            if (changeStatusId == @((byte)UserStatusEnum.Active)) {
+                                userStatus.classList.remove("badge-danger")
+                                userStatus.classList.add("badge-success")
+                                userStatus.innerText = "Aktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Deactive))
+                            }
+                            else {
+                                userStatus.classList.remove("badge-success")
+                                userStatus.classList.add("badge-danger")
+                                userStatus.innerText = "Deaktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Active))
+                            }
+
+
+                            swal(
+                                'Uğurlu əməliyyat!',
+                                'Dəyişikliklər yadda saxlanıldı.',
+                                'success'
+                            );
+                            return;
+                        }
+                    })
+                });
+
+            })
+
+            surnameFilter.addEventListener("keyup", function () {
+
+                Filter((res) => {
+                    const result = JSON.parse(res.responseText);
+                    document.querySelector("#table-area").innerHTML = result.data;
+                    FilterByPagination();
+                    ChangeUserStatus((res, userStatus, changeStatusId) => {
+
+                        res = JSON.parse(res.responseText);
+
+                        if (res.status == 400) {
+                            swal({
+                                type: 'error',
+                                title: 'Oops...',
+                                text: `${res.error}`
+                            });
+                            return;
+                        }
+                        else {
+
+                            if (changeStatusId == @((byte)UserStatusEnum.Active)) {
+                                userStatus.classList.remove("badge-danger")
+                                userStatus.classList.add("badge-success")
+                                userStatus.innerText = "Aktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Deactive))
+                            }
+                            else {
+                                userStatus.classList.remove("badge-success")
+                                userStatus.classList.add("badge-danger")
+                                userStatus.innerText = "Deaktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Active))
+                            }
+
+
+                            swal(
+                                'Uğurlu əməliyyat!',
+                                'Dəyişikliklər yadda saxlanıldı.',
+                                'success'
+                            );
+                            return;
+                        }
+                    })
+                });
+
+            })
+
+            emailFilter.addEventListener("keyup", function () {
+
+                Filter((res) => {
+                    const result = JSON.parse(res.responseText);
+                    document.querySelector("#table-area").innerHTML = result.data;
+                    FilterByPagination();
+                    ChangeUserStatus((res, userStatus, changeStatusId) => {
+
+                        res = JSON.parse(res.responseText);
+
+                        if (res.status == 400) {
+                            swal({
+                                type: 'error',
+                                title: 'Oops...',
+                                text: `${res.error}`
+                            });
+                            return;
+                        }
+                        else {
+
+                            if (changeStatusId == @((byte)UserStatusEnum.Active)) {
+                                userStatus.classList.remove("badge-danger")
+                                userStatus.classList.add("badge-success")
+                                userStatus.innerText = "Aktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Deactive))
+                            }
+                            else {
+                                userStatus.classList.remove("badge-success")
+                                userStatus.classList.add("badge-danger")
+                                userStatus.innerText = "Deaktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Active))
+                            }
+
+
+                            swal(
+                                'Uğurlu əməliyyat!',
+                                'Dəyişikliklər yadda saxlanıldı.',
+                                'success'
+                            );
+                            return;
+                        }
+                    })
+                });
+
+            });
+
+            ChangeUserStatus((res,userStatus,changeStatusId) => {
+                
+                res = JSON.parse(res.responseText);
+                
+                if (res.status == 400) {
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: `${res.error}`
+                    });
+                    return;
+                }
+                else{
+
+                    if (changeStatusId == @((byte)UserStatusEnum.Active)){
+                        userStatus.classList.remove("badge-danger")
+                        userStatus.classList.add("badge-success")
+                        userStatus.innerText = "Aktiv"
+                        userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Deactive))
                     }
+                    else {
+                        userStatus.classList.remove("badge-success")
+                        userStatus.classList.add("badge-danger")
+                        userStatus.innerText = "Deaktiv"
+                        userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Active))
+                    }
+                  
 
-                    xhr.open("GET", "https://localhost:7024/Admin/User/Filter?page=" + clickedPage, true);
+                    swal(
+                        'Uğurlu əməliyyat!',
+                        'Dəyişikliklər yadda saxlanıldı.',
+                        'success'
+                    );
+                    return;
+                }
+            })
 
-                    xhr.send();
-                })
-            }
+          
         })
 
 
-       
+
     </script>
 }
