@@ -1,0 +1,37 @@
+﻿@model List<CategoryDto>
+
+<div class="panel-group commonAccordion" id="accordion_@(Guid.NewGuid())" role="tablist" aria-multiselectable="true">
+
+    @foreach (var category in Model)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingOne_@(category.CategoryId)">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne_@(category.CategoryId)" aria-expanded="true" aria-controls="collapseOne_@(category.CategoryId)">
+                        @category.Name
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseOne_@(category.CategoryId)" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne_@(category.CategoryId)">
+                <div class="panel-body">
+                    <ul>
+                        @foreach (var child in category.Children)
+                        {
+                            <li>
+                                @if (child.Children.Count > 0)
+                                {
+                                    @await Html.PartialAsync("_ProductListCategoryPartial", child.Children)
+                                }
+                                else
+                                {
+                                    <a href="#!">@child.Name</a>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
