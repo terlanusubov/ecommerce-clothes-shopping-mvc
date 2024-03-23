@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddMemoryCache();
+
 builder.Services.AddSingleton<SlackService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

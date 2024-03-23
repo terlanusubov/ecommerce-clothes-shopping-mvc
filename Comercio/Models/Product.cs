@@ -26,5 +26,6 @@
         public GenderType GenderType { get; set; }
         public ICollection<ProductOption> ProductOptions { get; set; }
         public ICollection<ProductPhoto> ProductPhotos { get; set; }
+        public ICollection<UserWishlist> UserWishlists { get; set; }
     }
 }

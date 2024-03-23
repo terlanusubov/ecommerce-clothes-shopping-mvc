@@ -6,6 +6,7 @@ namespace Comercio.Data
     public class ApplicationDbContext : DbContext
     {
         public DbSet<Category> Categories { get; set; }
+        public DbSet<UserWishlist> UserWishlists { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<GenderType> GenderTypes { get; set; }

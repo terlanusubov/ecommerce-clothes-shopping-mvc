@@ -83,6 +83,7 @@ namespace Comercio.Models
 
 
         public UserRole UserRole { get; set; }
+        public ICollection<UserWishlist> UserWishlists { get; set; }
         public City City { get; set; }
 
 
