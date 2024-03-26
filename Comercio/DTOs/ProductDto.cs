@@ -10,5 +10,9 @@
         public double Price { get; set; }
         public bool IsWishlist { get; set; }
 
+        public int? Discount { get; set; }
+
+        public double? DiscountedPrice { get; set; }
+
     }
 }

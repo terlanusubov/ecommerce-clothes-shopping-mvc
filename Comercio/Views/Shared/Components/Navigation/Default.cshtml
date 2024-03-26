@@ -6,7 +6,7 @@
         @foreach (var category in Model)
         {
             <li class="dropdown">
-                <a href="index.html">@category.Name</a>
+                <a href="@Url.Action("List","Product", new {categoryId = category.CategoryId})">@category.Name</a>
             </li>
         }
 

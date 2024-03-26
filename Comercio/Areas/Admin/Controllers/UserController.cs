@@ -21,13 +21,16 @@ namespace Comercio.Areas.Admin.Controllers
     public class UserController : BaseController
     {
         private ICompositeViewEngine _viewEngine;
+        private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
 
         public UserController(ApplicationDbContext context,
-            ICompositeViewEngine viewEngine)
+            ICompositeViewEngine viewEngine,
+            IConfiguration configuration)
         {
             _context = context;
-            _viewEngine = viewEngine;       
+            _viewEngine = viewEngine;
+            _configuration = configuration;
 
         }
         public async Task<IActionResult> List(int page = 1)
@@ -104,11 +107,13 @@ namespace Comercio.Areas.Admin.Controllers
      
         private async Task<(List<UserDto>,int)> SelectUsers(IQueryable<User> query, int page)
         {
+            var takeNumber = Convert.ToInt32(_configuration["List:AdminUsers"]);
+
             query = query.OrderByDescending(u => u.Created);
 
             var count = await query.CountAsync();
 
-            var totalPage = (int)Math.Ceiling(count / (decimal)5);
+            var totalPage = (int)Math.Ceiling(count / (decimal)takeNumber);
 
             var users = await query.Include(u => u.UserRole)
                                  .Select(u => new UserDto
@@ -125,8 +130,8 @@ namespace Comercio.Areas.Admin.Controllers
                                      Role = u.UserRole.Name,
                                      RoleId = u.UserRoleId
                                  })
-                                 .Skip((page - 1) * 5) //TODO: change hard code
-                                 .Take(5)
+                                 .Skip((page - 1) * takeNumber) 
+                                 .Take(takeNumber)
                                  .ToListAsync();
 
 

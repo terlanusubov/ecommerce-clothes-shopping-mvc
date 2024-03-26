@@ -43,3 +43,41 @@
 </section>
 
 
+
+@section Scripts {
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			let page = 1;
+
+			const loadMoreBtn = document.querySelector(".load-more");
+
+			loadMoreBtn.addEventListener("click", function (e) {
+				e.preventDefault();
+
+				let xhr = new XMLHttpRequest();
+
+				page = page + 1; //page++
+
+				xhr.open("GET", "https://localhost:7024/product/filter?page=" + page, true);
+
+				xhr.send();
+
+				xhr.onreadystatechange = function () {
+					if (this.readyState == 4 && this.status == 200) {
+						let result = JSON.parse(this.responseText);
+
+						console.log(result);
+
+						if (result.status == 200) {
+
+						}
+						else {
+
+						}
+					}
+				}
+
+			})
+		});
+	</script>
+}

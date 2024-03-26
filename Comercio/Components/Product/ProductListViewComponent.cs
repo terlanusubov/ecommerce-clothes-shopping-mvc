@@ -10,13 +10,17 @@ namespace Comercio.Components.Product
     public class ProductListViewComponent : ViewComponent
     {
         private readonly ApplicationDbContext _context;
-
-        public ProductListViewComponent(ApplicationDbContext context)
+        private readonly IConfiguration _configuration;
+        public ProductListViewComponent(ApplicationDbContext context,
+                                        IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
         public async Task<IViewComponentResult> InvokeAsync(ProductListQueryModel request)
         {
+            //TODO: must work for parent category id filter
+
             string userId = null;
            
             if (HttpContext.User.Identity.IsAuthenticated)
@@ -24,19 +28,21 @@ namespace Comercio.Components.Product
                 userId = HttpContext.User.Claims.Where(c => c.Type == "Id").FirstOrDefault().Value;
             }
 
+            var takeNumber = request.Take ?? Convert.ToInt32(_configuration["List:Products"]);
+
+            var productImageBasePath = _configuration["Folders:Products"];
+
             var query = _context.Products.Where(c => (request.CategoryId == null || c.CategoryId == request.CategoryId));
 
             var count = await query.CountAsync();
 
             query = query.OrderByDescending(c => c.Created);
 
-            //TODO: change hard code
-            query = query.Skip((request.Page - 1) * 10).Take(10);
+            query = query.Skip((request.Page - 1) * takeNumber).Take(takeNumber);
 
             query = query.Include(c => c.ProductPhotos)
                          .Include(c=>c.UserWishlists);
 
-            //TODO: change hard code of image url
             var products = await query.Select(c => new ProductDto
             {
                 ProductId = c.Id,
@@ -45,21 +51,20 @@ namespace Comercio.Components.Product
                 
                 Description = c.Description,
                 
-                ImageURL = "https://localhost:7024/uploads/products/" + c.ProductPhotos.Where(a => a.IsMain).Select(a => a.ImageURL).FirstOrDefault(),
+                ImageURL = productImageBasePath + c.ProductPhotos.Where(a => a.IsMain).Select(a => a.ImageURL).FirstOrDefault(),
                 
                 Name = c.Name,
                 
                 Price = c.SellAmount,
                
-                IsWishlist = userId == null? false : c.UserWishlists.Any(a=>a.UserId.ToString() == userId) 
+                IsWishlist = userId == null? false : c.UserWishlists.Any(a=>a.UserId.ToString() == userId) ,
+
+                Discount = c.Discount,
                 
-                //TODO: if product has discount then subtract it and return discount too
-           
+                DiscountedPrice = c.Discount != null ? c.SellAmount - (c.SellAmount * (double)c.Discount / 100) : null
             }).ToListAsync();
 
-            //TODO: check if product doesnt have main image or any image
-
-            var totalPage = (int)Math.Ceiling(count / (decimal)10); //TODO: change take hard code number
+            var totalPage = (int)Math.Ceiling(count / (decimal)takeNumber);
 
             var vm = new ProductListVm
             {

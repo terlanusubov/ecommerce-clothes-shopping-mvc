@@ -39,7 +39,6 @@ namespace Comercio.Components.Product
         private async Task<List<CategoryDto>> GetCategoryTree(int? parentId = null)
         {
 
-            //TODO: cache here
             List<CategoryDto> result = new List<CategoryDto>();
 
             var categories = await _context.Categories.Where(c => c.ParentId == parentId)

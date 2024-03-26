@@ -2338,3 +2338,23 @@ input[type=email]:focus, input[type=password]:focus, input[type=text]:focus, inp
   color: #555;
 }
 /*# sourceMappingURL=style.css.map */
+
+
+
+/*Custom css*/
+
+.load-more-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.load-more {
+    display: inline-block;
+    padding: 10px 20px;
+    border: 1px solid #555;
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer
+}
