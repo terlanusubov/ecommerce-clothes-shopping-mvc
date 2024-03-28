@@ -24,7 +24,7 @@
                                 }
                                 else
                                 {
-                                    <a href="@Url.Action("List","Product", new {categoryId = child.CategoryId})">@child.Name</a>
+                                    <a data-categoryId="@child.CategoryId" href="@Url.Action("List","Product", new {categoryId = child.CategoryId})">@child.Name</a>
                                 }
                             </li>
                         }

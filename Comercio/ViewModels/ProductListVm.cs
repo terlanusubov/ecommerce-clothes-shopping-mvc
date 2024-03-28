@@ -6,6 +6,8 @@ namespace Comercio.ViewModels
     {
         public List<ProductDto> Products { get; set; }
         public int CurrentPage { get; set; }
+
+        public int ProductCount { get; set; }
         public int TotalPage { get; set; }
     }
 }

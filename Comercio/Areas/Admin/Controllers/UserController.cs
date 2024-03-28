@@ -4,6 +4,7 @@ using Comercio.Areas.Admin.Models;
 using Comercio.Areas.Admin.ViewModels;
 using Comercio.Data;
 using Comercio.Enums;
+using Comercio.Helper;
 using Comercio.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -70,7 +71,12 @@ namespace Comercio.Areas.Admin.Controllers
                 Users = result.Item1
             };
 
-            var html = await RenderPartialViewToString("_UserListPartialView",vm);
+            var html = await RenderPartialView.InvokeAsync("_UserListPartialView",
+                                                            ControllerContext,
+                                                            _viewEngine,
+                                                            ViewData,
+                                                            TempData,
+                                                            vm);
 
             return Json(new
             {
@@ -138,32 +144,7 @@ namespace Comercio.Areas.Admin.Controllers
             return (users,totalPage);
         }
 
-        private async Task<string> RenderPartialViewToString(string viewName, object model)
-        {
-            if (string.IsNullOrEmpty(viewName))
-                viewName = ControllerContext.ActionDescriptor.ActionName;
-
-            ViewData.Model = model;
-
-            using (var writer = new StringWriter())
-            {
-                ViewEngineResult viewResult =
-                    _viewEngine.FindView(ControllerContext, viewName, false);
-
-                ViewContext viewContext = new ViewContext(
-                    ControllerContext,
-                    viewResult.View,
-                    ViewData,
-                    TempData,
-                    writer,
-                    new HtmlHelperOptions()
-                );
-
-                await viewResult.View.RenderAsync(viewContext);
-
-                return writer.GetStringBuilder().ToString();
-            }
-        }
+        
 
     }
 }

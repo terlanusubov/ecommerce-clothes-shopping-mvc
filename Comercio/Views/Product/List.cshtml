@@ -1,83 +1,160 @@
-﻿
-@model ProductListQueryModel
+﻿@model ProductListQueryModel
 
 <section class="page-header">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<div class="content">
-					<h1 class="page-name">Shop</h1>
-					<ol class="breadcrumb">
-						<li><a href="index.html">Home</a></li>
-						<li class="active">shop</li>
-					</ol>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="content">
+                    <h1 class="page-name">Shop</h1>
+                    <ol class="breadcrumb">
+                        <li><a href="index.html">Home</a></li>
+                        <li class="active">shop</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 
 <section class="products section">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-3">
-				<div class="widget">
-					<h4 class="widget-title">Short By</h4>
-					<form method="post" action="#">
-						<select class="form-control">
-							<option>Man</option>
-							<option>Women</option>
-							<option>Accessories</option>
-							<option>Shoes</option>
-						</select>
-					</form>
-				</div>
-				@await Component.InvokeAsync("ProductListCategory")
-			</div>
-			
-			@await Component.InvokeAsync("ProductList", Model)
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="widget">
+                    <h4 class="widget-title">Short By</h4>
+                    <form method="post" action="#">
+                        <select class="form-control">
+                            <option>Man</option>
+                            <option>Women</option>
+                            <option>Accessories</option>
+                            <option>Shoes</option>
+                        </select>
+                    </form>
+                </div>
+                @await Component.InvokeAsync("ProductListCategory")
+            </div>
 
-		</div>
-	</div>
+            <div class="col-md-9 product-list-wrapper">
+                <div class="row" style="position:relative">
+                    @await Component.InvokeAsync("ProductList", Model)
+                </div>
+                <div class="load-more-wrapper">
+                    <a href="#" class="load-more">Load more</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 
 
 @section Scripts {
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			let page = 1;
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-			const loadMoreBtn = document.querySelector(".load-more");
+            const searchParams = new URLSearchParams(window.location.search);
 
-			loadMoreBtn.addEventListener("click", function (e) {
-				e.preventDefault();
+            const defaultCategoryId = searchParams.get("categoryId");
 
-				let xhr = new XMLHttpRequest();
+            let page = 1;
 
-				page = page + 1; //page++
+            const loadMoreWrapper = document.querySelector(".load-more-wrapper");
+            const loadMoreBtn = document.querySelector(".load-more");
 
-				xhr.open("GET", "https://localhost:7024/product/filter?page=" + page, true);
+            loadMoreBtn.addEventListener("click", function (e) {
+                e.preventDefault();
 
-				xhr.send();
+                //TODO when we click load more then take CATEGORY also
+                let xhr = new XMLHttpRequest();
 
-				xhr.onreadystatechange = function () {
-					if (this.readyState == 4 && this.status == 200) {
-						let result = JSON.parse(this.responseText);
+                page = page + 1; //page++
 
-						console.log(result);
+                const clickedCategory = document.querySelector(".clicked-category");
 
-						if (result.status == 200) {
+                let clickedCategoryId = 0;
 
-						}
-						else {
+                if (clickedCategory != undefined) {
+                     clickedCategoryId = clickedCategory.getAttribute("data-categoryId");
+                }
 
-						}
-					}
-				}
+                let categoryQueryPath = "";
 
-			})
-		});
-	</script>
+                if (clickedCategoryId != 0) {
+                    categoryQueryPath += "&categoryId=" + clickedCategoryId;
+                }
+                else if(defaultCategoryId != null || defaultCategoryId!= undefined) {
+                    categoryQueryPath += "&categoryId=" + defaultCategoryId;
+                }
+
+                xhr.open("GET", "https://localhost:7024/product/filter?page=" + page + categoryQueryPath, true);
+
+                xhr.send();
+
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        let result = JSON.parse(this.responseText);
+
+                        const productListRow = document.querySelector(".product-list-wrapper .row");
+
+                        const productList = document.querySelector(".product-list-wrapper");
+
+                        if (result.status == 200) {
+                            if (page == result.totalPage) {
+                                //TODO when category changed revert back load more
+                                productList.removeChild(loadMoreWrapper);
+                            }
+
+                            productListRow.innerHTML += result.data;
+                        }
+                        else {
+                            alert("Xeta bas verdi!");
+                        }
+                    }
+                }
+
+            });
+
+
+            const categoryLinks = document.querySelectorAll(".panel-body a");
+
+            for(let categoryLink of categoryLinks){
+                categoryLink.addEventListener("click",function(e){
+                    e.preventDefault();
+
+                    page = 1;
+
+                    categoryLinks.forEach(c => c.classList.remove("clicked-category"));
+
+                    //TODO when category changes then change URL also
+                    this.classList.add("clicked-category");
+
+                    //TODO can work for multiple category
+                    const clickedCategoryId =  this.getAttribute("data-categoryId");
+
+                    let xhr = new XMLHttpRequest();
+
+                    xhr.open("GET", "https://localhost:7024/product/filter?categoryId=" + clickedCategoryId, true);
+
+                    xhr.send();
+
+                    xhr.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            let result = JSON.parse(this.responseText);
+
+                            const productListRow = document.querySelector(".product-list-wrapper .row");
+                            productListRow.innerHTML = "";
+                            if (result.status == 200) {
+                                productListRow.innerHTML += result.data;
+                            }
+                            else {
+                                alert("Xeta bas verdi!");
+                            }
+                        }
+                    }
+                })
+            }
+
+        });
+    </script>
 }

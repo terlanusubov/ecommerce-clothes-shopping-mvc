@@ -1,5 +1,7 @@
 ﻿using Comercio.Components.Product;
 using Comercio.Data;
+using Comercio.Helper;
+using Comercio.Interfaces;
 using Comercio.ServiceModels;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +15,13 @@ namespace Comercio.Controllers
 {
     public class ProductController : Controller
     {
-        private readonly IViewComponentHelper _viewComponentHelper;
-        public ProductController(IViewComponentHelper viewComponentHelper)
+        private readonly ICompositeViewEngine _viewEngine;
+        private readonly IProductManager _productManager;
+        public ProductController(IProductManager productManager,
+                                ICompositeViewEngine viewEngine)
         {
-            _viewComponentHelper = viewComponentHelper;
+            _productManager = productManager;
+            _viewEngine = viewEngine;
         }
 
         public IActionResult List([FromQuery]ProductListQueryModel request)
@@ -28,16 +33,34 @@ namespace Comercio.Controllers
         [HttpGet]
         public async Task<JsonResult> Filter([FromQuery] ProductListQueryModel request)
         {
-			var viewComponentResult = await _viewComponentHelper.InvokeAsync(typeof(ProductListViewComponent), request);
+            try
+            {
+                var vm = await _productManager.GetFilteredProducts(request);
 
-			var viewContent = RenderViewToString(viewComponentResult);
-
-			return Json(new
-			{
-				data = viewContent,
-				status = 200,
-				currentPage = request.Page
-			});
+                var html = await RenderPartialView.InvokeAsync("_ProductListPartial",
+                                                                ControllerContext,
+                                                                _viewEngine,
+                                                                ViewData,
+                                                                TempData,
+                                                                vm);
+                return Json(new
+                {
+                    data = html,
+                    status = 200,
+                    productCount = vm.ProductCount,
+                    totalPage = vm.TotalPage,
+                    currentPage = request.Page
+                });
+            }
+            catch (Exception exp)
+            {
+                return Json(new
+                {
+                    error = "xeta bas verdi",
+                    status = 500
+                });
+            }
+           
 		}
 
         private string RenderViewToString(IHtmlContent viewContent)

@@ -2345,7 +2345,7 @@ input[type=email]:focus, input[type=password]:focus, input[type=text]:focus, inp
 
 .load-more-wrapper {
     position: absolute;
-    bottom: 0;
+    bottom: -10%;
     left: 50%;
     transform: translateX(-50%);
 }

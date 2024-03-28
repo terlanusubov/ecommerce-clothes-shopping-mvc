@@ -1,5 +1,7 @@
 using Comercio.Data;
+using Comercio.Interfaces;
 using Comercio.Notifications.Slack;
+using Comercio.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
@@ -10,6 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();
 
 builder.Services.AddSingleton<SlackService>();
+
+builder.Services.AddTransient<IProductManager, ProductManager>();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
