@@ -57,6 +57,13 @@
 
             const defaultCategoryId = searchParams.get("categoryId");
 
+            if (defaultCategoryId != undefined && defaultCategoryId != null) {
+                const defaultSelectedCategory = document.querySelector(`a[data-categoryId="${defaultCategoryId}"]`)
+                if (defaultSelectedCategory != undefined && defaultCategoryId != null) {
+                    defaultSelectedCategory.classList.add("clicked-category");
+                }
+            }
+
             let page = 1;
 
             const loadMoreWrapper = document.querySelector(".load-more-wrapper");
@@ -65,7 +72,6 @@
             loadMoreBtn.addEventListener("click", function (e) {
                 e.preventDefault();
 
-                //TODO when we click load more then take CATEGORY also
                 let xhr = new XMLHttpRequest();
 
                 page = page + 1; //page++
@@ -102,7 +108,7 @@
                         if (result.status == 200) {
                             if (page == result.totalPage) {
                                 //TODO when category changed revert back load more
-                                productList.removeChild(loadMoreWrapper);
+                                loadMoreWrapper.style.display = "none";
                             }
 
                             productListRow.innerHTML += result.data;
@@ -122,15 +128,20 @@
                 categoryLink.addEventListener("click",function(e){
                     e.preventDefault();
 
+                    loadMoreWrapper.style.display = "block";
+
                     page = 1;
 
                     categoryLinks.forEach(c => c.classList.remove("clicked-category"));
 
-                    //TODO when category changes then change URL also
                     this.classList.add("clicked-category");
 
                     //TODO can work for multiple category
                     const clickedCategoryId =  this.getAttribute("data-categoryId");
+
+                    searchParams.set("categoryId", clickedCategoryId);
+
+                    history.pushState(null, null, "?" + searchParams.toString());
 
                     let xhr = new XMLHttpRequest();
 
@@ -154,7 +165,7 @@
                     }
                 })
             }
-
+            //todo state change olanda categoryId gotur ve sorgu at ona uygun
         });
     </script>
 }

@@ -1,5 +1,6 @@
 ﻿using Comercio.Data;
 using Comercio.DTOs;
+using Comercio.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -24,7 +25,7 @@ namespace Comercio.Components.Product
 
             if (!_memoryCache.TryGetValue("Categories", out res))
             {
-                res = await GetCategoryTree();
+                res = await GeneralHelper.GetCategoryTree(_context);
 
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                                               .SetSlidingExpiration(TimeSpan.FromMinutes(10));
@@ -36,45 +37,6 @@ namespace Comercio.Components.Product
             return View(res);
         }
 
-        private async Task<List<CategoryDto>> GetCategoryTree(int? parentId = null)
-        {
-
-            List<CategoryDto> result = new List<CategoryDto>();
-
-            var categories = await _context.Categories.Where(c => c.ParentId == parentId)
-                                                        .Select(c => new CategoryDto
-                                                        {
-                                                            CategoryId = c.Id,
-                                                            Slogan = c.Slogan,
-                                                            BackgroundImageUrl = c.BackgroundImageURL,
-                                                            Name = c.Name,
-                                                            ParentId = c.ParentId,
-                                                            Priority = c.Priority ?? 0
-                                                        })
-                                                        .ToListAsync();
-            foreach (var category in categories)
-            {
-                var children = await _context.Categories.Where(c => c.ParentId == category.CategoryId).Select(c => new CategoryDto
-                {
-                    CategoryId = c.Id,
-                    Slogan = c.Slogan,
-                    BackgroundImageUrl = c.BackgroundImageURL,
-                    Name = c.Name,
-                    ParentId = c.ParentId,
-                    Priority = c.Priority ?? 0
-                }).ToListAsync();
-
-                if (children.Count > 0)
-                {
-                    category.Children.AddRange(await GetCategoryTree(category.CategoryId));
-                }
-
-            }
-
-            result.AddRange(categories);
-
-            return result;
-
-        }
+       
     }
 }
