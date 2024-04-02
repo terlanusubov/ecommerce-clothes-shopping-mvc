@@ -3,6 +3,7 @@ using Comercio.Data;
 using Comercio.Helper;
 using Comercio.Interfaces;
 using Comercio.ServiceModels;
+using Comercio.ViewModels;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -63,6 +64,22 @@ namespace Comercio.Controllers
            
 		}
 
+        [HttpGet]
+        public async Task<IActionResult> Detail(Guid productId)
+        {
+            var productGetResult = await _productManager.GetProductById(productId);
+
+            if(productGetResult is null)
+            {
+                return Content("bele bir mehsul yoxdur");
+            }
+
+            var vm = new ProductDetailVm();
+
+            vm.Product = productGetResult;
+
+            return View(vm);
+        }
         private string RenderViewToString(IHtmlContent viewContent)
         {
             using (var writer = new StringWriter())

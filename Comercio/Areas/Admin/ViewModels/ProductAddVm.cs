@@ -4,13 +4,13 @@ namespace Comercio.Areas.Admin.ViewModels
 {
     public class ProductGetModel
     {
-        public List<CategoryDto> Categories { get; set; }
+        public List<CategoryDto> Categories { get; set; } = new List<CategoryDto>();
 
-        public List<GenderTypeDto> Genders { get; set; }
+        public List<GenderTypeDto> Genders { get; set; } = new List<GenderTypeDto>();
     }
     public class ProductPostModel
     {
-        public int ProductVariantId { get; set; }
+        //public int ProductVariantId { get; set; }
         public string Name { get; set; }
         public string Barcode { get; set; }
         public int CategoryId { get; set; }
@@ -25,7 +25,7 @@ namespace Comercio.Areas.Admin.ViewModels
         public bool HasShipping { get; set; }
         public int? Discount { get; set; }
         public IFormFile MainImage { get; set; } 
-        public List<IFormFile> OtherImages { get; set; }
+        public List<IFormFile> OtherImages { get; set; } = new List<IFormFile>();
     }
     public class ProductAddVm
     {

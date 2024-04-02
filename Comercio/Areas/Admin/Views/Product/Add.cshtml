@@ -1,77 +1,97 @@
 ﻿@model ProductAddVm
-<form>
+<form method="post" action="@Url.Action("Add","Product")" enctype="multipart/form-data">
     <div class="form-row mb-4">
         <div class="form-group col-md-6">
             <label for="name">Ad</label>
-            <input type="text" class="form-control" id="name" placeholder="Ad">
+            <input name="ProductPost.Name" type="text" class="form-control" id="name" placeholder="Ad">
+            @Html.ValidationMessageFor(c => c.ProductPost.Name)
         </div>
         <div class="form-group col-md-6">
             <label for="barcode">Barkod</label>
-            <input type="text" class="form-control" id="barcode" placeholder="Barkod">
+            <input name="ProductPost.Barcode" type="text" class="form-control" id="barcode" placeholder="Barkod">
+            @Html.ValidationMessageFor(c => c.ProductPost.Barcode)
         </div>
     </div>
     <div class="form-row mb-4">
         <div class="form-group col-md-6">
             <label for="categories">Kateqoriya</label>
-            <select id="categories" class="form-control">
+            <select name="ProductPost.CategoryId" id="categories" class="form-control">
                 <option selected>Seç...</option>
-               
+                @foreach (var category in Model?.ProductGet?.Categories)
+                {
+                    <option value="@category.CategoryId">@category.Name</option>
+                }
+                @* TODO: add Category recursive*@
+
             </select>
         </div>
         <div class="form-group col-md-6">
             <label for="genderTypes">Cinsiyyət</label>
-            <select id="genderTypes" class="form-control">
+            <select name="ProductPost.GenderTypeId" id="genderTypes" class="form-control">
                 <option selected>Seç...</option>
-
+                @foreach (var gender in Model?.ProductGet?.Genders)
+                {
+                    <option value="@gender.GenderTypeId">@gender.GenderName</option>
+                }
             </select>
         </div>
     </div>
     <div class="form-row mb-4">
         <div style="width:100%" class="form-group mb-4">
             <label for="description">Təsvir</label>
-            <textarea rows="10" class="form-control" id="description" placeholder="Təsvir"></textarea>
+            <textarea name="ProductPost.Description" rows="10" class="form-control" id="description" placeholder="Təsvir"></textarea>
         </div>
     </div>
     <div class="form-row mb-4">
         <div class="form-group col-md-3">
             <label for="sellAmount">Satış qiyməti</label>
-            <input type="text" class="form-control" id="sellAmount" placeholder="Satış qiyməti">
+            <input name="ProductPost.SellAmount" type="text" class="form-control" id="sellAmount" placeholder="Satış qiyməti">
         </div>
         <div class="form-group col-md-3">
             <label for="buyAmount">Alış qiyməti</label>
-            <input type="text" class="form-control" id="buyAmount" placeholder="Alış qiyməti">
+            <input name="ProductPost.BuyAmount" type="text" class="form-control" id="buyAmount" placeholder="Alış qiyməti">
         </div>
         <div class="form-group col-md-3">
             <label for="buyLimit">Alış limiti</label>
-            <input type="text" class="form-control" id="buyLimit" placeholder="Alış limiti">
+            <input name="ProductPost.BuyLimit" type="text" class="form-control" id="buyLimit" placeholder="Alış limiti">
         </div>
         <div class="form-group col-md-3">
             <label for="quantity">Stok sayı</label>
-            <input type="text" class="form-control" id="quantity" placeholder="Stok sayı">
+            <input name="ProductPost.Quantity" type="text" class="form-control" id="quantity" placeholder="Stok sayı">
         </div>
     </div>
     <div class="form-row mb-4">
         <div style="display:flex;gap:10px;" class="form-group col-md-3">
             Stokda varmı?
             <label class="switch s-icons s-outline  s-outline-primary  mb-4 mr-2">
-                <input id="inStock" type="checkbox" checked="">
+                <input name="ProductPost.InStock" id="inStock" type="checkbox" checked="">
                 <span class="slider round"></span>
             </label>
         </div>
         <div style="display:flex;gap:10px;" class="form-group col-md-3">
             Çatdırılma varmı?
             <label class="switch s-icons s-outline  s-outline-primary  mb-4 mr-2">
-                <input id="hasShipping" type="checkbox" checked="">
+                <input name="ProductPost.HasShipping" id="hasShipping" type="checkbox" checked="">
                 <span class="slider round"></span>
             </label>
         </div>
         <div class="form-group col-md-3">
             <label for="showQuantity">Saytda görünən stok sayı</label>
-            <input type="text" class="form-control" id="showQuantity" placeholder="Saytda görünən stok sayı">
+            <input name="ProductPost.ShowQuantity" type="text" class="form-control" id="showQuantity" placeholder="Saytda görünən stok sayı">
         </div>
         <div class="form-group col-md-3">
             <label for="discount">Endirim %</label>
-            <input type="text" class="form-control" id="discount" placeholder="Endirim">
+            <input name="ProductPost.Discount" type="text" class="form-control" id="discount" placeholder="Endirim">
+        </div>
+    </div>
+    <div class="form-row mb-4">
+        <div class="form-group col-md-3">
+            <label for="mainImage">Əsas şəkil</label>
+            <input name="ProductPost.MainImage" type="file" class="form-control" id="mainImage" >
+        </div>
+        <div class="form-group col-md-3">
+            <label for="otherImages">Digər şəkillər</label>
+            <input name="ProductPost.OtherImages" multiple type="file" class="form-control" id="otherImages" >
         </div>
     </div>
     <button type="submit" class="btn btn-primary mt-3">Yadda Saxla</button>
@@ -81,6 +101,12 @@
     <link href="~/admin/assets/css/scrollspyNav.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="~/admin/assets/css/forms/switches.css">
     <link href="~/admin/plugins/apex/apexcharts.css" rel="stylesheet" type="text/css">
+    <style>
+        .field-validation-error{
+            color:red;
+            font-weight:bold;
+        }
+    </style>
 }
 
 @section SCRIPTS {
