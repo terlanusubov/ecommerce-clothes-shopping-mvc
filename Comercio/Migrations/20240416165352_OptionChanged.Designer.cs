@@ -4,6 +4,7 @@ using Comercio.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Comercio.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240416165352_OptionChanged")]
+    partial class OptionChanged
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,8 +169,6 @@ namespace Comercio.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OptionGroupId");
 
                     b.ToTable("Options");
                 });
@@ -732,17 +733,6 @@ namespace Comercio.Migrations
                     b.ToTable("UserWishlists");
                 });
 
-            modelBuilder.Entity("Comercio.Models.Option", b =>
-                {
-                    b.HasOne("Comercio.Models.OptionGroup", "OptionGroup")
-                        .WithMany("Options")
-                        .HasForeignKey("OptionGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("OptionGroup");
-                });
-
             modelBuilder.Entity("Comercio.Models.OptionGroup", b =>
                 {
                     b.HasOne("Comercio.Models.Category", "Category")
@@ -865,11 +855,6 @@ namespace Comercio.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Comercio.Models.OptionGroup", b =>
-                {
-                    b.Navigation("Options");
                 });
 
             modelBuilder.Entity("Comercio.Models.Product", b =>

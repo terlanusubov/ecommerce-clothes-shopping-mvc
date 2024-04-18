@@ -1,0 +1,37 @@
+﻿@model SpecificationOptionAddVm
+<form method="post" action="@Url.Action("AddOptionToSpecification","Specification")">
+    <div class="form-row mb-4">
+        <div class="form-group col-md-6">
+            <label for="optionGroups">Xüsusiyyətlər</label>
+            <select id="optionGroups" name="SpecificationOption.OptionGroupId" class="form-control">
+                @foreach (var optionGroup in Model.OptionGroups)
+                {
+                    <option value="@optionGroup.OptionGroupId">
+                        @optionGroup.Name
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="name">Ad</label>
+            <input name="SpecificationOption.Name" type="text" class="form-control" id="name" placeholder="Ad">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Yadda Saxla</button>
+</form>
+
+@section CSS {
+    @*  <link href="~/admin/assets/css/scrollspyNav.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="~/admin/assets/css/forms/switches.css">
+    <link href="~/admin/plugins/apex/apexcharts.css" rel="stylesheet" type="text/css">
+    <style>
+        .field-validation-error {
+            color: red;
+            font-weight: bold;
+        }
+    </style> *@
+}
+
+@section SCRIPTS {
+    @* <script src="~/admin/plugins/apex/apexcharts.min.js"></script> *@
+}
