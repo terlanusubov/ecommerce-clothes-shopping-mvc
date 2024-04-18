@@ -36,6 +36,8 @@
             </select>
         </div>
     </div>
+    <div class="form-row other-specs">
+    </div>
     <div class="form-row mb-4">
         <div style="width:100%" class="form-group mb-4">
             <label for="description">Təsvir</label>
@@ -87,11 +89,11 @@
     <div class="form-row mb-4">
         <div class="form-group col-md-3">
             <label for="mainImage">Əsas şəkil</label>
-            <input name="ProductPost.MainImage" type="file" class="form-control" id="mainImage" >
+            <input name="ProductPost.MainImage" type="file" class="form-control" id="mainImage">
         </div>
         <div class="form-group col-md-3">
             <label for="otherImages">Digər şəkillər</label>
-            <input name="ProductPost.OtherImages" multiple type="file" class="form-control" id="otherImages" >
+            <input name="ProductPost.OtherImages" multiple type="file" class="form-control" id="otherImages">
         </div>
     </div>
     <button type="submit" class="btn btn-primary mt-3">Yadda Saxla</button>
@@ -102,13 +104,91 @@
     <link rel="stylesheet" type="text/css" href="~/admin/assets/css/forms/switches.css">
     <link href="~/admin/plugins/apex/apexcharts.css" rel="stylesheet" type="text/css">
     <style>
-        .field-validation-error{
-            color:red;
-            font-weight:bold;
+        .field-validation-error {
+            color: red;
+            font-weight: bold;
         }
     </style>
 }
 
 @section SCRIPTS {
     <script src="~/admin/plugins/apex/apexcharts.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+           
+
+            const categories = document.getElementById("categories");
+
+            categories.addEventListener("change", function () {
+                let otherSpecsDiv = document.querySelector(".other-specs");
+
+                otherSpecsDiv.innerHTML = "";
+
+                let xhr = new XMLHttpRequest();
+
+                const categoryId = this.value;
+
+                xhr.open("GET", "https://localhost:7024/Admin/Specification/GetSpecificationsByCategoryId?categoryId=" + categoryId, true);
+
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        const result = JSON.parse(this.responseText);
+
+                        if (result.status == 400) {
+                            alert("Xeta bas verdi!");
+                            return;
+                        }
+
+
+                        otherSpecsDiv.classList.add("mb-4");
+
+                        for (let sp of result.data) {
+                            if (sp.options[0].name == sp.name) {
+                                let input = document.createElement("input");
+
+                                input.setAttribute("type", "text");
+
+                                input.setAttribute("placeholder", sp.name);
+
+                                input.classList.add("form-control");
+
+                                otherSpecsDiv.appendChild(input);
+                                return;
+                            }
+
+                            let labelforSelect = document.createElement("label");
+                           
+                            labelforSelect.innerText = sp.name;
+
+                            let select = document.createElement("select");
+
+                            select.classList.add("form-control");
+
+                            otherSpecsDiv.appendChild(labelforSelect);
+
+                            let defaultOption = document.createElement("option");
+                           
+                            defaultOption.innerText = "--Seç--";
+                            
+                            select.appendChild(defaultOption);
+                            for(let op of sp.options){
+                                let optionElement = document.createElement("option");
+                               
+                                optionElement.value = op.specOptionId;
+
+                                optionElement.innerText = op.name;
+
+                                select.appendChild(optionElement);
+                            }
+
+                            otherSpecsDiv.appendChild(select);
+                        }
+                    }
+                }
+
+                xhr.send();
+
+            });
+        })
+    </script>
 }

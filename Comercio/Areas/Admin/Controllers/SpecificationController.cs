@@ -1,4 +1,5 @@
-﻿using Comercio.Areas.Admin.ViewModels;
+﻿using Comercio.Areas.Admin.DTOs;
+using Comercio.Areas.Admin.ViewModels;
 using Comercio.Data;
 using Comercio.DTOs;
 using Comercio.Models;
@@ -60,7 +61,7 @@ namespace Comercio.Areas.Admin.Controllers
             await _context.OptionGroups.AddAsync(group);
             await _context.SaveChangesAsync();
 
-            if(!request.Specification.IsSelected)
+            if(request.Specification.IsSelected != 1)
             {
                 Comercio.Models.Option defaultOption = new Comercio.Models.Option();
 
@@ -80,7 +81,7 @@ namespace Comercio.Areas.Admin.Controllers
         {
             var optionGroups = await _context.OptionGroups
                 .Include(_ => _.Options)
-                .Where(_ => _.Options.Any(c=>!c.IsSelected)).Select(_ => new OptionGroupDto
+                .Where(_ => !_.Options.Any(c=>c.Name == _.Name)).Select(_ => new OptionGroupDto
             {
                 Name = _.Name,
                 OptionGroupId = _.Id
@@ -110,6 +111,37 @@ namespace Comercio.Areas.Admin.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("List", "Specification");
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetSpecificationsByCategoryId(int? categoryId)
+        {
+            if(categoryId is null)
+            {
+                return Json(new
+                {
+                    status = 400
+                });
+            }
+
+            var specifications = await _context.OptionGroups.Include(_ => _.Options)
+                                                            .Where(_ => _.CategoryId == categoryId)
+                                                            .Select(_ => new SpecificationDto
+                                                            {
+                                                                SpecId = _.Id,
+                                                                Name = _.Name,
+                                                                Options = _.Options == null ? null : _.Options.Select(o => new SpecOptionDto
+                                                                {
+                                                                    SpecOptionId = o.Id,
+                                                                    Name = o.Name
+                                                                }).ToList()
+                                                            }).ToListAsync();
+
+            return Json(new
+            {
+                status = 200,
+                data = specifications
+            });
         }
     }
 }

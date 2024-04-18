@@ -45,5 +45,22 @@ namespace Comercio.Helper
             return result;
 
         }
+   
+        public static async Task<List<CategoryDto>> GetAllCategories(ApplicationDbContext _context)
+        {
+            var categories = await _context.Categories
+                                                        .Select(c => new CategoryDto
+                                                        {
+                                                            CategoryId = c.Id,
+                                                            Slogan = c.Slogan,
+                                                            BackgroundImageUrl = c.BackgroundImageURL,
+                                                            Name = c.Name,
+                                                            ParentId = c.ParentId,
+                                                            Priority = c.Priority ?? 0
+                                                        })
+                                                        .ToListAsync();
+          
+            return categories;
+        }
     }
 }

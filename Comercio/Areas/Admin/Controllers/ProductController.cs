@@ -96,14 +96,14 @@ namespace Comercio.Areas.Admin.Controllers
         {
             List<CategoryDto> res;
 
-            if (!_memoryCache.TryGetValue("Categories", out res))
+            if (!_memoryCache.TryGetValue("AdminProductAddCategories", out res))
             {
-                res = await GeneralHelper.GetCategoryTree(_context);
+                res = await GeneralHelper.GetAllCategories(_context);
 
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                                               .SetSlidingExpiration(TimeSpan.FromMinutes(10));
 
-                _memoryCache.Set("Categories", res, cacheEntryOptions);
+                _memoryCache.Set("AdminProductAddCategories", res, cacheEntryOptions);
 
             }
 
