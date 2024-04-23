@@ -2,6 +2,12 @@
 
 namespace Comercio.Areas.Admin.ViewModels
 {
+    public class ProductSpecificationValue
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public int OptionId { get; set; }
+    }
     public class ProductGetModel
     {
         public List<CategoryDto> Categories { get; set; } = new List<CategoryDto>();
@@ -26,6 +32,8 @@ namespace Comercio.Areas.Admin.ViewModels
         public int? Discount { get; set; }
         public IFormFile MainImage { get; set; } 
         public List<IFormFile> OtherImages { get; set; } = new List<IFormFile>();
+
+        public List<ProductSpecificationValue> Specifications { get; set; }
     }
     public class ProductAddVm
     {

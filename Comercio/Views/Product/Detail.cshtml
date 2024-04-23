@@ -90,6 +90,12 @@
                     <p class="product-description mt-20">
                     @Model.Product.Description   
                     </p>
+                    <ul>
+                        @foreach (var item in Model.Product.Specifications)
+                        {
+                            <li>@item.Name : @item.Value</li>
+                        }
+                    </ul>
                   @*   <div class="color-swatches">
                         <span>color:</span>
                         <ul>

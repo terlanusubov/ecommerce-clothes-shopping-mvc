@@ -49,7 +49,7 @@ namespace Comercio.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async  Task<IActionResult> Add([FromForm] ProductAddVm request)
+        public async  Task<JsonResult> Add([FromForm] ProductAddVm request)
         {
             var validationResult = await _productManager.ValidateProduct(request.ProductPost);
 
@@ -58,8 +58,11 @@ namespace Comercio.Areas.Admin.Controllers
                 await FillModelState(validationResult.Item2);
                 
                 request.ProductGet = await CreateProductGet();
-               
-                return View(request);
+
+                return Json(new
+                {
+                    status = 400
+                });
             }
 
             var productCreateResult = await _productManager.CreateProduct(request.ProductPost);
@@ -68,10 +71,13 @@ namespace Comercio.Areas.Admin.Controllers
             {
                 request.ProductGet = await CreateProductGet();
 
-                return View(request);
+                return Json(new
+                {
+                    status = 400
+                });
             }
 
-            return RedirectToAction("List", "Product");  
+            return Json(new { status = 200 });
         }
 
         [HttpGet]

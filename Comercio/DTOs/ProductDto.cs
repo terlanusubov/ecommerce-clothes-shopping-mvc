@@ -1,4 +1,6 @@
-﻿namespace Comercio.DTOs
+﻿using Comercio.Areas.Admin.ViewModels;
+
+namespace Comercio.DTOs
 {
     public class ProductDto
     {
@@ -17,6 +19,8 @@
 
         public string CategoryName { get; set; }
         public int CategoryId { get; set; }
+
+        public List<ProductSpecificationValue> Specifications { get; set; }
 
     }
 }

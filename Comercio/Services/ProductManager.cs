@@ -119,6 +119,23 @@ namespace Comercio.Services
                 }
                 #endregion
 
+                #region Speficiations 
+                if(request.Specifications != null)
+                {
+                    foreach (var specification in request.Specifications)
+                    {
+                        ProductOption po = new ProductOption();
+
+                        po.ProductId = product.Id;
+                        po.OptionId = specification.OptionId;
+                        po.Value = specification.Value;
+
+                        await _context.ProductsOption.AddAsync(po);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                #endregion
+
                 await _context.Database.CommitTransactionAsync();
 
                 return true;
@@ -198,6 +215,9 @@ namespace Comercio.Services
            result = await _context.Products
                                     .Include(c=> c.ProductPhotos)
                                     .Include(c=> c.Category)
+                                    .Include(c=> c.ProductOptions)
+                                    .ThenInclude(c=> c.Option)
+                                    .ThenInclude(c=>c.OptionGroup)
                                     .Where(c => c.Id == productId)
                                     .Select(c => new ProductDto
                                     {
@@ -223,7 +243,15 @@ namespace Comercio.Services
                                         
                                         CategoryName = c.Category.Name,
 
-                                        CategoryId = c.CategoryId
+                                        CategoryId = c.CategoryId,
+
+                                        Specifications = c.ProductOptions.Select(a=> new ProductSpecificationValue
+                                        {
+                                            Value = a.Value,
+                                            OptionId = a.Id,
+                                            Name = a.Option.OptionGroup.Name
+                                        }).ToList()
+
                                     }).FirstOrDefaultAsync();
 
             return result;

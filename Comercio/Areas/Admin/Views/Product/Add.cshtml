@@ -96,7 +96,7 @@
             <input name="ProductPost.OtherImages" multiple type="file" class="form-control" id="otherImages">
         </div>
     </div>
-    <button type="submit" class="btn btn-primary mt-3">Yadda Saxla</button>
+    <button type="button" id="save-product" class="btn btn-primary mt-3">Yadda Saxla</button>
 </form>
 
 @section CSS {
@@ -147,10 +147,12 @@
                                 let input = document.createElement("input");
 
                                 input.setAttribute("type", "text");
+                                input.setAttribute("data-optionId", sp.options[0].id);
 
                                 input.setAttribute("placeholder", sp.name);
 
                                 input.classList.add("form-control");
+                                input.classList.add("custom-spec");
 
                                 otherSpecsDiv.appendChild(input);
                                 return;
@@ -163,6 +165,7 @@
                             let select = document.createElement("select");
 
                             select.classList.add("form-control");
+                            select.classList.add("custom-spec");
 
                             otherSpecsDiv.appendChild(labelforSelect);
 
@@ -189,6 +192,85 @@
                 xhr.send();
 
             });
+
+
+            const saveProductBtn = document.getElementById("save-product");
+
+            saveProductBtn.addEventListener("click", function (e) {
+                
+                let formData = new FormData();
+
+                formData.append("ProductPost.Name", document.getElementById("name").value);
+                formData.append("ProductPost.Barcode", document.getElementById("barcode").value);
+                formData.append("ProductPost.CategoryId", document.getElementById("categories").value);
+                formData.append("ProductPost.GenderTypeId", document.getElementById("genderTypes").value);
+                formData.append("ProductPost.Description", document.getElementById("description").value);
+                formData.append("ProductPost.SellAmount", document.getElementById("sellAmount").value);
+                formData.append("ProductPost.BuyAmount", document.getElementById("buyAmount").value);
+                formData.append("ProductPost.BuyLimit", document.getElementById("buyLimit").value);
+                formData.append("ProductPost.Quantity", document.getElementById("quantity").value);
+                formData.append("ProductPost.InStock", document.getElementById("inStock").value);
+                formData.append("ProductPost.HasShipping", document.getElementById("hasShipping").value);
+                formData.append("ProductPost.ShowQuantity", document.getElementById("showQuantity").value);
+                formData.append("ProductPost.Discount", document.getElementById("showQuantity").value);
+                formData.append("ProductPost.MainImage", document.getElementById("mainImage").files[0]);
+
+                let index = 0;
+                for (let f of document.getElementById("otherImages").files) {
+                    formData.append(`ProductPost.OtherImages[${index}]`, f);
+                    index++;
+                }
+
+                const specs = document.querySelectorAll(".custom-spec");
+
+                let specValues = [];
+
+                for(let sp of specs){
+                   
+                    if (sp.getAttribute("data-optionId") != undefined && sp.getAttribute("data-optionId") != null) {
+                        specValues.push({
+                            value : sp.value,
+                            optionId: sp.getAttribute("data-optionId")
+                        });
+                        continue;
+                    }
+
+                    const textOfOption = sp.querySelector(`option[value='${sp.value}']`).innerText;
+
+                    specValues.push({
+                        value: textOfOption,
+                        optionId: sp.value
+                    });
+
+                }
+
+                index = 0;
+                for(let sp of specValues){
+                    formData.append(`ProductPost.Specifications[${index}].Value`, sp.value);
+                    formData.append(`ProductPost.Specifications[${index}].OptionId`, sp.optionId);
+                }
+
+                let xhr = new XMLHttpRequest();
+
+                xhr.open("POST", "https://localhost:7024/Admin/Product/Add",true);
+
+                // xhr.setRequestHeader("content-type", "multipart/form-data");
+
+                xhr.send(formData);
+
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        const result = JSON.parse(this.responseText);
+
+                        if (result.status == 400) {
+                            alert("xeta bas verdi!");
+                            return;
+                        }
+
+                        alert("urraaaa!");
+                    }
+                }
+            })
         })
     </script>
 }
