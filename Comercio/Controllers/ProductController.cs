@@ -80,13 +80,5 @@ namespace Comercio.Controllers
 
             return View(vm);
         }
-        private string RenderViewToString(IHtmlContent viewContent)
-        {
-            using (var writer = new StringWriter())
-            {
-                viewContent.WriteTo(writer, HtmlEncoder.Default);
-                return writer.ToString();
-            }
-        }
     }
 }
